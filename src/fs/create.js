@@ -1,18 +1,22 @@
-import fs from "fs/promises";
+import{writeFile,access,constants}from 'node:fs/promises';
+import { join,dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const create = async () => {
-  try {
-    const data = await fs.readFile("././files/fresh.txt", "utf-8");
-    if (data) {
-      throw new Error("FS operation failed");
+  const filName=fileURLToPath(import.meta.url);
+  const __dirname=dirname(filName);
+  const filePath=join(__dirname,"files",'fresh.txt');
+   try {
+    await access(filePath,constants.F_OK)
+    throw new Error("FS operation failed");
+    
+   } catch (error) {
+    if(error.code==="ENOENT"){
+        await writeFile(filePath,'I am fresh and young')
+    }else{
+        throw new Error('FS operation failed');
     }
-  } catch (error) {
-    if (error.code === "ENOENT") {
-      await fs.writeFile("./files/fresh.txt", "I am fresh and young");
-    } else {
-      throw error;
-    }
-  }
+   }
 };
 
 await create();
