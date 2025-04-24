@@ -1,24 +1,21 @@
-import { createHash } from "crypto";
-import { createReadStream } from "fs";
-import { pipeline } from "stream";
-import { promisify } from "util";
-
-const pipelineAsync = promisify(pipeline);
-
+import { createReadStream } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import { createHash } from "node:crypto";
 const calculateHash = async () => {
-  const filePath = "./files/fileToCalculateHashFor.txt";
+  const fileName = fileURLToPath(import.meta.url);
+  const __dirname = dirname(fileName);
+  const filePath = join(__dirname,"files", "fileToCalculateHashFor.txt");
 
   const hash = createHash("sha256");
-
-  const fileStream = createReadStream(filePath);
-
-  try {
-    await pipelineAsync(fileStream, hash.setEncoding("hex"));
-
-    console.log(hash.read());
-  } catch (err) {
-    console.error("Error while calculating hash:", err);
-  }
+  const input = createReadStream(filePath);
+  input.pipe(hash);
+  hash.on("readable", () => {
+    const data = hash.read();
+    if (data) {
+      console.log(data.toString("hex"));
+    }
+  });
 };
 
 await calculateHash();
