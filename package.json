@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "This repository is the part of nodejs-assignments https://github.com/AlreadyBored/nodejs-assignments",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.14.0"
   },
   "type": "module",
   "scripts": {
@@ -39,11 +39,5 @@
   "bugs": {
     "url": "https://github.com/AlreadyBored/node-nodejs-basics/issues"
   },
-  "homepage": "https://github.com/AlreadyBored/node-nodejs-basics#readme",
-  "devDependencies": {
-    "@types/node": "^22.7.4"
-  },
-  "dependencies": {
-    "dotenv": "^16.4.5"
-  }
+  "homepage": "https://github.com/AlreadyBored/node-nodejs-basics#readme"
 }
