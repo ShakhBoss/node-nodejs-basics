@@ -1,18 +1,21 @@
-import { createWriteStream } from "fs";
+import { createWriteStream } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const write = async () => {
-  const filePath = "./files/fileToWrite.txt";
+  const fileName = fileURLToPath(import.meta.url);
+  const __dirname = dirname(fileName);
+  const filePath = join(__dirname, "files", "fileToWrite.txt");
 
-  const fileStream = createWriteStream(filePath);
+  const writableStream = createWriteStream(filePath, "utf-8");
 
-  fileStream.on("error", (err) => {
-    console.error("Error writing to the file:", err);
+  process.stdin.pipe(writableStream);
+
+  writableStream.on("finish", () => {
+    console.log("Finished writing");
   });
-
-  process.stdin.pipe(fileStream);
-
-  fileStream.on("finish", () => {
-    console.log("Data has been written to file successfully.");
+  writableStream.on("error", (err) => {
+    console.error(err.message);
   });
 };
 
