@@ -1,15 +1,12 @@
 const parseArgs = () => {
-  const args = process.argv.slice(2);
-
-  const formattedArgs = [];
-
-  for (let i = 0; i < args.length; i += 2) {
-    const propName = args[i].replace(/^--/, "");
-    const propValue = args[i + 1];
-    formattedArgs.push(`${propName} is ${propValue}`);
+  const argv=process.argv.slice(2)
+  const formatData=[];
+  for(let i=0; i<argv.length-1;i+=2){
+    const promtData=argv[i].replace(/^--/,"");
+    const promtValue=argv[i+1];
+    formatData.push(`${promtData} is ${promtValue}`)
   }
-
-  console.log(formattedArgs.join(", "));
+  console.log(formatData.join(", "));
 };
 
 parseArgs();
