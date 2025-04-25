@@ -1,26 +1,29 @@
-import { createReadStream, createWriteStream } from "fs";
-import { createGunzip } from "zlib";
-import { pipeline } from "stream";
-import { promisify } from "util";
-
-const pipelineAsync = promisify(pipeline);
+import { createReadStream, createWriteStream, unlink } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import { createGunzip } from "node:zlib";
+import { pipeline } from "node:stream/promises";
 
 const decompress = async () => {
-  const inputFilePath = "./files/archive.gz";
-  const outputFilePath = "./files/fileToCompress.txt";
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
 
-  const readStream = createReadStream(inputFilePath);
-
-  const writeStream = createWriteStream(outputFilePath);
-
-  const gunzip = createGunzip();
+  const sourcePath = join(__dirname, "files", "archive.gz");
+  const destinationPath = join(__dirname, "files", "fileToCompress.txt");
 
   try {
-    await pipelineAsync(readStream, gunzip, writeStream);
+    await pipeline(
+      createReadStream(sourcePath),
+      createGunzip(),
+      createWriteStream(destinationPath)
+    );
 
-    console.log(`File has been decompressed and saved to ${outputFilePath}`);
+    unlink(sourcePath, (err) => {
+      if (err) throw err;
+      console.log("archive.gz deleted");
+    });
   } catch (err) {
-    console.error("Error during decompression:", err);
+    console.error("Decompression failed:", err.message);
   }
 };
 

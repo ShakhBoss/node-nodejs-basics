@@ -1,26 +1,29 @@
-import { createReadStream, createWriteStream } from "fs";
-import { createGzip } from "zlib";
-import { pipeline } from "stream";
-import { promisify } from "util";
-
-const pipelineAsync = promisify(pipeline);
+import { createReadStream, createWriteStream, unlink } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import { createGzip } from "node:zlib";
+import { pipeline } from "node:stream/promises";
 
 const compress = async () => {
-  const inputFilePath = "./files/fileToCompress.txt";
-  const outputFilePath = "./files/archive.gz";
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
 
-  const readStream = createReadStream(inputFilePath);
-
-  const writeStream = createWriteStream(outputFilePath);
-
-  const gzip = createGzip();
+  const sourcePath = join(__dirname, "files", "fileToCompress.txt");
+  const destinationPath = join(__dirname, "files", "archive.gz");
 
   try {
-    await pipelineAsync(readStream, gzip, writeStream);
+    await pipeline(
+      createReadStream(sourcePath),
+      createGzip(),
+      createWriteStream(destinationPath)
+    );
 
-    console.log(`File has been compressed and saved to ${outputFilePath}`);
+    unlink(sourcePath, (err) => {
+      if (err) throw err;
+      console.log("fileToCompress.txt deleted");
+    });
   } catch (err) {
-    console.error("Error during compression:", err);
+    console.error("Compression failed:", err.message);
   }
 };
 
