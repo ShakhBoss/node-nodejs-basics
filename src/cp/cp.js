@@ -1,19 +1,19 @@
 import { spawn } from "child_process";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 
-const spawnChildProcess = async (args) => {
-  const childProcess = spawn("node", ["script.js", ...args]);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-  process.stdin.pipe(childProcess.stdin);
+export const spawnChildProcess = (args) => {
+  const scriptPath = join(__dirname, 'files',"script.js");
 
-  childProcess.stdout.pipe(process.stdout);
-
-  childProcess.on("error", (err) => {
-    console.error("Failed to start child process:", err);
+  const child = spawn("node", [scriptPath, ...args], {
+    stdio: ["pipe", "pipe", "inherit"],
   });
 
-  childProcess.on("exit", (code) => {
-    console.log(`Child process exited with code ${code}`);
-  });
+  process.stdin.pipe(child.stdin);
+
+  child.stdout.pipe(process.stdout);
 };
-
-spawnChildProcess(["arg1", "arg2"]);
+spawnChildProcess(['hello', 'world']);
